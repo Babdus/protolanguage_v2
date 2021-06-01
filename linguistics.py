@@ -501,6 +501,10 @@ class Lexeme(object):
         """Return len(self.phonemes)"""
         return self.phonemes.__len__()
 
+    def __contains__(self, item):
+        """Return item in selt.phonemes"""
+        return item in self.phonemes
+
     def insert(self, index, item):
         """self.phonemes.insert(index, item)"""
         self.phonemes.insert(index, item)
@@ -619,8 +623,12 @@ class Language(object):
         self.lexemes = lexemes
         for lexeme in self.lexemes:
             lexeme.language_code = code
+        self._redefine_lexemes_dict()
         self.parent_edge = None
         self.child_edges = []
+
+    def _redefine_lexemes_dict(self):
+        self.lexemes_dict = {lexeme.meaning: lexeme for lexeme in self.lexemes}
 
     def __repr__(self):
         args = f"'{self.name}', '{self.code}', {self.lexemes}"
@@ -632,19 +640,43 @@ class Language(object):
 
     def __getitem__(self, index):
         """Return self.lexemes[index]"""
-        return self.lexemes.__getitem__(index)
+        if isinstance(index, int):
+            return self.lexemes.__getitem__(index)
+        else:
+            return self.lexemes_dict.__getitem__(index)
 
     def __setitem__(self, index, item):
         """self.lexemes[index] = item"""
+        meaning = self.lexemes.__getitem__(index).meaning
+        self.lexemes_dict.__delitem__(meaning)
         self.lexemes.__setitem__(index, item)
+        self.lexemes_dict[item.meaning] = item
 
     def __delitem__(self, index):
         """del self.lexemes[index]"""
+        meaning = self.lexemes.__getitem__(index).meaning
+        self.lexemes_dict.__delitem__(meaning)
         self.lexemes.__delitem__(index)
 
     def __len__(self):
         """Return len(self.lexemes)"""
         return self.lexemes.__len__()
+
+    def __contains__(self, item):
+        """Return item in self.lexemes"""
+        if isinstance(item, Lexeme):
+            return item in self.lexemes
+        elif isinstance(item, str):
+            return item in self.lexemes_dict
+        return False
+
+    def __and__(self, other):
+        """Return a set of word meanings that are in both languages"""
+        return set(self.lexemes_dict) & set(other.lexemes_dict)
+
+    def __or__(self, other):
+        """Return a set of word meanings that are in any of these languages"""
+        return set(self.lexemes_dict) | set(other.lexemes_dict)
 
     def insert(self, index, item):
         """self.lexemes.insert(index, item)"""
@@ -661,7 +693,7 @@ class Language(object):
     def get_dictionary(self):
         """Return a dictionary of the words this language contains with keys in
         English and values with IPA transcriptions of these words."""
-        return {lexeme.meaning: str(lexeme) for lexeme in self.lexemes}
+        return self.lexemes_dict
 
     def get_parent_language(self):
         """Return a parent language of this language if set, otherwise return None."""
@@ -679,7 +711,7 @@ class Language(object):
     def is_root(self):
         """Check if this language is a root node in the tree (has no parent
         language)"""
-        return len(self.parent_edge) == 0
+        return self.parent_edge is None
 
 
 class Edge(object):
