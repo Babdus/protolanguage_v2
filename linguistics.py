@@ -292,6 +292,22 @@ class Phoneme(object):
             return all(f in self.features for f in item)
         return False
 
+    def __sub__(self, other):
+        """Return set of fetures that are in this phoneme and not in other"""
+        return self.features - other.features
+
+    def __and__(self, other):
+        """Return a union of features set from this and other phoneme"""
+        return self.features & other.features
+
+    def __or__(self, other):
+        """Return an intersection of features set from this and other phoneme"""
+        return self.features | other.features
+
+    def __xor__(self, other):
+        """Return set of features that are in this or the other phoneme but not in both"""
+        return self.features ^ other.features
+
     def add(self, feature, redefine=True):
         """Add a feature to the features of this phoneme."""
         self.features.add(feature)

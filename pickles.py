@@ -15,3 +15,5 @@ ipa_rules = read_pickle('data/pickles/ipa_rules.pickle')
 feature_subsets = read_pickle('data/pickles/feature_subsets.pickle')
 
 feature_categories = ['place', 'secondary_place', 'manner', 'secondary_manner', 'airflow']
+
+asymmetric_feature_distance_map = read_pickle('data/pickles/asymmetric_feature_distance_map.pickle')
