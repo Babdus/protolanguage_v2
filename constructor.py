@@ -46,17 +46,17 @@ def phoneme_distance(ph1, ph2, munk):
         return 0
     set1 = ph1 - ph2
     set2 = ph2 - ph1
-    list1 = list(set1) + [features_cache['X']] * len(set2)
-    list2 = list(set2) + [features_cache['X']] * len(set1)
+    list1 = list(set1) + [ln.features_cache['X']] * len(set2)
+    list2 = list(set2) + [ln.features_cache['X']] * len(set1)
     matrix = [[afdm[(f1.code, f2.code)] if (f1.code, f2.code) in afdm else DISALLOWED for f2 in list2] for f1 in list1]
     indexes = munk.compute(matrix)
     return sum(matrix[r][c] for r, c in indexes)
 
 
-def construct_phoneme_distance_matrix(languages, csv_path='data/phoneme_distances.csv'):
+def construct_phoneme_distance_matrix(languages, csv_path=None):
     munk = Munkres()
     all_phonemes = sorted(list({phoneme for language in languages for lexeme in language for phoneme in lexeme}))
-    matrix = [[distance(ph1, ph2, munk) for ph2 in all_phonemes] for ph1 in all_phonemes]
+    matrix = [[phoneme_distance(ph1, ph2, munk) for ph2 in all_phonemes] for ph1 in all_phonemes]
     all_symbols = list(map(lambda x: x.representation, all_phonemes))
     df = pd.DataFrame(matrix, columns=all_symbols, index=all_symbols)
     if csv_path:
