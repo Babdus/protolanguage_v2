@@ -1,6 +1,9 @@
 import linguistics as ln
+from pickles import asymmetric_feature_distance_map as afdm
 import parser
 import pandas as pd
+import numpy as np
+from munkres import Munkres, DISALLOWED
 from log_functions import colored
 
 
@@ -37,3 +40,25 @@ def construct_languages(catalogue_path, min_words=40):
 #     print(colored(language[3].meaning).white().bold())
 #     print(colored(language[3].name).red().bold().italic().dim())
 # print(len(languages))
+
+def phoneme_distance(ph1, ph2, munk):
+    if ph1 == ph2:
+        return 0
+    set1 = ph1 - ph2
+    set2 = ph2 - ph1
+    list1 = list(set1) + [features_cache['X']] * len(set2)
+    list2 = list(set2) + [features_cache['X']] * len(set1)
+    matrix = [[afdm[(f1.code, f2.code)] if (f1.code, f2.code) in afdm else DISALLOWED for f2 in list2] for f1 in list1]
+    indexes = munk.compute(matrix)
+    return sum(matrix[r][c] for r, c in indexes)
+
+
+def construct_phoneme_distance_matrix(languages, csv_path='data/phoneme_distances.csv'):
+    munk = Munkres()
+    all_phonemes = sorted(list({phoneme for language in languages for lexeme in language for phoneme in lexeme}))
+    matrix = [[distance(ph1, ph2, munk) for ph2 in all_phonemes] for ph1 in all_phonemes]
+    all_symbols = list(map(lambda x: x.representation, all_phonemes))
+    df = pd.DataFrame(matrix, columns=all_symbols, index=all_symbols)
+    if csv_path:
+        df.to_csv(csv_path)
+    return df, matrix, all_phonemes
