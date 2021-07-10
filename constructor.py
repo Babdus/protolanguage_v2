@@ -42,6 +42,7 @@ def construct_phoneme_distance_matrix(
     ) -> NamedMatrix:
     munk = Munkres()
     all_phonemes = sorted(list({phon for lang in languages for lex in lang for phon in lex}))
+    all_phonemes.append(ln.Phoneme(set()))
     matrix = NamedMatrix(
         column_names=all_phonemes,
         row_names=all_phonemes,
