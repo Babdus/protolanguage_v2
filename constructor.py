@@ -1,10 +1,13 @@
 import linguistics as ln
+from structures import NamedMatrix
+from comparison import calculate_phoneme_distance
 from pickles import asymmetric_feature_distance_map as afdm
 import parser
 import pandas as pd
 import numpy as np
-from munkres import Munkres, DISALLOWED
+from munkres import Munkres
 from log_functions import colored
+from typing import List
 
 
 def construct_languages(catalogue_path, min_words=40):
@@ -32,33 +35,19 @@ def construct_languages(catalogue_path, min_words=40):
         languages.append(ln.Language(language_name, language_code, lexemes=lexemes))
     return languages
 
-# languages = construct_languages('../Protolanguage/Data/words_and_languages/Catalogue.csv')
-# for language in languages:
-#     print(colored(language.code).yellow().bold())
-#     print(colored(language.name).green())
-#     print(colored(language[3].representation).blue().inverse())
-#     print(colored(language[3].meaning).white().bold())
-#     print(colored(language[3].name).red().bold().italic().dim())
-# print(len(languages))
 
-def phoneme_distance(ph1, ph2, munk):
-    if ph1 == ph2:
-        return 0
-    set1 = ph1 - ph2
-    set2 = ph2 - ph1
-    list1 = list(set1) + [ln.features_cache['X']] * len(set2)
-    list2 = list(set2) + [ln.features_cache['X']] * len(set1)
-    matrix = [[afdm[(f1.code, f2.code)] if (f1.code, f2.code) in afdm else DISALLOWED for f2 in list2] for f1 in list1]
-    indexes = munk.compute(matrix)
-    return sum(matrix[r][c] for r, c in indexes)
-
-
-def construct_phoneme_distance_matrix(languages, csv_path=None):
+def construct_phoneme_distance_matrix(
+            languages: List[ln.Language],
+            csv_path: str = None
+    ) -> NamedMatrix:
     munk = Munkres()
-    all_phonemes = sorted(list({phoneme for language in languages for lexeme in language for phoneme in lexeme}))
-    matrix = [[phoneme_distance(ph1, ph2, munk) for ph2 in all_phonemes] for ph1 in all_phonemes]
-    all_symbols = list(map(lambda x: x.representation, all_phonemes))
-    df = pd.DataFrame(matrix, columns=all_symbols, index=all_symbols)
+    all_phonemes = sorted(list({phon for lang in languages for lex in lang for phon in lex}))
+    matrix = NamedMatrix(
+        column_names=all_phonemes,
+        row_names=all_phonemes,
+        function=calculate_phoneme_distance,
+        args=[munk]
+    )
     if csv_path:
-        df.to_csv(csv_path)
-    return df, matrix, all_phonemes
+        matrix.to_csv(csv_path)
+    return matrix

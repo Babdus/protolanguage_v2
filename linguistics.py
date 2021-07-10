@@ -1,16 +1,20 @@
 import pickle
 from pickles import feature_categories, features_info, ipa_rules, feature_subsets
+from pickles import asymmetric_feature_distance_map as afdm
 from log_functions import colored
 from collections import Iterable
+
 
 def save(obj, path):
     with open(path, 'wb') as f:
         pickle.dump(obj, f)
 
+
 def load(path):
     with open(path, 'wb') as f:
         obj = pickle.load('path')
     return obj
+
 
 class Feature(object):
     """Feature(name, code, category, index)
@@ -120,8 +124,15 @@ class Feature(object):
     def __hash__(self):
         return hash(self.code)
 
+    def distance_to(self, other, default=None):
+        if (self.code, other.code) in afdm:
+            return afdm[(self.code, other.code)]
+        return default
+
+
 features_cache = {k: Feature(v[1], k, v[2], v[0]) for k, v in features_info.items()}
 fts = features_cache
+empty_feature = features_cache['X']
 
 class Phoneme(object):
     """Phoneme(features, representation='')
@@ -728,27 +739,3 @@ class Language(object):
         """Check if this language is a root node in the tree (has no parent
         language)"""
         return self.parent_edge is None
-
-
-class Edge(object):
-    def __init__(self, parent_language, child_language, distance=0):
-        self.parent_language = parent_language
-        self.child_language = child_language
-        self.distance = distance
-
-
-class Tree(object):
-    def __init__(self, root_language):
-        self.root = root_language
-        self.languages = set()
-        self.leaves = set()
-        self.edges = set()
-        self._discover_descendants(self.root)
-
-    def _discover_descendants(self, root):
-        for child_edge in root.child_edges:
-            self.edges.add(child_edge)
-            self.languages.add(child_edge.child_language)
-            self._discover_descendants(child_edge.child_language)
-            if child_edge.child_language.is_leaf():
-                self.leaves.add(child_edge.child_language)
