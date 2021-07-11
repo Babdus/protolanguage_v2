@@ -1,4 +1,4 @@
-import linguistics as ln
+from linguistics import Language, Phoneme, empty_phoneme
 from structures import NamedMatrix
 from comparison import calculate_phoneme_distance
 from pickles import asymmetric_feature_distance_map as afdm
@@ -32,17 +32,17 @@ def construct_languages(catalogue_path, min_words=40):
             except ValueError as e:
                 print(colored(str(e)).red().bold(), word, meaning, language_name)
             lexemes.append(lexeme)
-        languages.append(ln.Language(language_name, language_code, lexemes=lexemes))
+        languages.append(Language(language_name, language_code, lexemes=lexemes))
     return languages
 
 
 def construct_phoneme_distance_matrix(
-            languages: List[ln.Language],
+            languages: List[Language],
             csv_path: str = None
     ) -> NamedMatrix:
     munk = Munkres()
     all_phonemes = sorted(list({phon for lang in languages for lex in lang for phon in lex}))
-    all_phonemes.append(ln.Phoneme(set()))
+    all_phonemes.append(empty_phoneme)
     matrix = NamedMatrix(
         column_names=all_phonemes,
         row_names=all_phonemes,

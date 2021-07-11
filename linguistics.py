@@ -390,6 +390,9 @@ class Phoneme(object):
         return len(self.features)
 
 
+empty_phoneme = Phoneme(set())
+
+
 class Lexeme(object):
     """Lexeme(phonemes, meaning='', language_code='')
 
