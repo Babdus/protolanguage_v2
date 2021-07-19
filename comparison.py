@@ -42,5 +42,6 @@ def calculate_language_distance(lang_1, lang_2, pdm):
     pool = Pool(cpu_count())
     args = [(lang_1[word], lang_2[word], pdm) for word in lang_1 & lang_2]
     dists = pool.starmap(calculate_lexeme_distance, args)
+    pool.close()
     scaled_dists = [dist/(len(lex1)+len(lex2)) for dist, lex1, lex2 in dists]
     return sum(scaled_dists)/len(scaled_dists)

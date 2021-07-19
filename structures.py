@@ -10,13 +10,22 @@ class NamedRow(object):
             row_name: Any,
             function: Callable[..., Any],
             args: List[Any] = [],
-            kwargs: Dict[str, Any] = {}
+            kwargs: Dict[str, Any] = {},
+            column_items: List[Any] = None,
+            row_item: Any = None,
+            printing: bool = False
     ) -> None:
         self.column_names = column_names
+        self.row_name = row_name
         self.index_map = {column_name: i for i, column_name in enumerate(self.column_names)}
+
+        self.column_items = self.column_names if not column_items else column_items
+        self.row_item = self.row_name if not row_item else row_item
+
         self.row = []
-        for column_name in self.column_names:
-            value = function(row_name, column_name, *args, **kwargs)
+        for i, column_item in enumerate(self.column_items):
+            print(self.row_name, '\t', self.column_names[i], end='\r') if printing else None
+            value = function(self.row_item, column_item, *args, **kwargs)
             self.row.append(value)
 
     def __getitem__(self, index: Any) -> Any:
@@ -39,14 +48,28 @@ class NamedMatrix(object):
             row_names: List[Any],
             function: Callable[..., Any],
             args: List[Any] = [],
-            kwargs: Dict[str, Any] = {}
+            kwargs: Dict[str, Any] = {},
+            column_items: List[Any] = None,
+            row_items: List[Any] = None,
+            printing: bool = False
     ) -> None:
         self.column_names = column_names
         self.row_names = row_names
         self.index_map = {row_name: i for i, row_name in enumerate(self.row_names)}
+
+        self.row_items = self.row_names if not row_items else row_items
+        self.column_items = self.column_names if not column_items else column_items
+
         self.matrix = []
-        for row_name in self.row_names:
-            row = NamedRow(self.column_names, row_name, function, args, kwargs)
+        for i, row_item in enumerate(self.row_items):
+            row = NamedRow(column_names=self.column_names,
+                           row_name=self.row_names[i],
+                           function=function,
+                           args=args,
+                           kwargs=kwargs,
+                           column_items=self.column_items,
+                           row_item=row_item,
+                           printing=printing)
             self.matrix.append(row)
 
     def __getitem__(self, index: Any) -> NamedRow:
