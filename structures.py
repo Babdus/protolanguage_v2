@@ -9,12 +9,16 @@ class NamedRow(object):
             column_names: List[Any],
             row_name: Any,
             function: Callable[..., Any],
-            args: List[Any] = [],
-            kwargs: Dict[str, Any] = {},
+            args: List[Any] = None,
+            kwargs: Dict[str, Any] = None,
             column_items: List[Any] = None,
             row_item: Any = None,
             printing: bool = False
     ) -> None:
+        if kwargs is None:
+            kwargs = {}
+        if args is None:
+            args = []
         self.column_names = column_names
         self.row_name = row_name
         self.index_map = {column_name: i for i, column_name in enumerate(self.column_names)}
@@ -47,12 +51,16 @@ class NamedMatrix(object):
             column_names: List[Any],
             row_names: List[Any],
             function: Callable[..., Any],
-            args: List[Any] = [],
-            kwargs: Dict[str, Any] = {},
+            args: List[Any] = None,
+            kwargs: Dict[str, Any] = None,
             column_items: List[Any] = None,
             row_items: List[Any] = None,
             printing: bool = False
     ) -> None:
+        if kwargs is None:
+            kwargs = {}
+        if args is None:
+            args = []
         self.column_names = column_names
         self.row_names = row_names
         self.index_map = {row_name: i for i, row_name in enumerate(self.row_names)}
@@ -84,7 +92,7 @@ class NamedMatrix(object):
     def __len__(self) -> int:
         return self.matrix.__len__()
 
-    def get_inner_matrix(self) -> List[List]:
+    def get_inner_matrix(self) -> List[List[Any]]:
         inner_matrix = []
         for row in self.matrix:
             inner_matrix.append(row.row)
@@ -103,7 +111,7 @@ class Edge(object):
             parent_language: Language,
             child_language: Language,
             distance: float = 0.0
-        ) -> None:
+    ) -> None:
         self.parent_language = parent_language
         self.child_language = child_language
         self.distance = distance

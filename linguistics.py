@@ -1,16 +1,20 @@
+from __future__ import annotations
+
 import pickle
-from pickles import feature_categories, features_info, ipa_rules, feature_subsets
-from pickles import asymmetric_feature_distance_map as afdm
-from log_functions import colored
 from collections import Iterable
+from typing import Any, Set, Union, List, Dict
+
+from log_functions import colored
+from pickles import asymmetric_feature_distance_map as afdm
+from pickles import feature_categories, features_info, ipa_rules, feature_subsets
 
 
-def save(obj, path):
+def save(obj: Any, path: str):
     with open(path, 'wb') as f:
         pickle.dump(obj, f)
 
 
-def load(path):
+def load(path: str):
     with open(path, 'wb') as f:
         obj = pickle.load('path')
     return obj
@@ -93,38 +97,39 @@ class Feature(object):
     >>> alveolar == alveolar_2
     True
     """
-    def __init__(self, name, code, category, index):
+
+    def __init__(self, name: str, code: str, category: str, index: int) -> None:
         self.name = name.capitalize()
         self.code = code.upper()
         self.category = category.lower()
         self.index = index
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         args = f"'{self.name}', '{self.code}', '{self.category}', {self.index}"
         return f"{colored(self.__class__.__name__).cyan()}({args})"
 
-    def __eq__(self, other):
+    def __eq__(self, other: 'Feature') -> bool:
         return isinstance(other, self.__class__) and self.code == other.code
 
-    def __ne__(self, other):
+    def __ne__(self, other: 'Feature') -> bool:
         return not (isinstance(other, self.__class__) and self.code == other.code)
 
-    def __lt__(self, other):
+    def __lt__(self, other: 'Feature') -> bool:
         return self.index < other.index
 
-    def __le__(self, other):
+    def __le__(self, other: 'Feature') -> bool:
         return self.index <= other.index
 
-    def __gt__(self, other):
+    def __gt__(self, other: 'Feature') -> bool:
         return self.index > other.index
 
-    def __ge__(self, other):
+    def __ge__(self, other: 'Feature') -> bool:
         return self.index >= other.index
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.code)
 
-    def distance_to(self, other, default=None):
+    def distance_to(self, other: 'Feature', default: Any = None) -> Any:
         if (self.code, other.code) in afdm:
             return afdm[(self.code, other.code)]
         return default
@@ -133,6 +138,7 @@ class Feature(object):
 features_cache = {k: Feature(v[1], k, v[2], v[0]) for k, v in features_info.items()}
 fts = features_cache
 empty_feature = features_cache['X']
+
 
 class Phoneme(object):
     """Phoneme(features, representation='')
@@ -245,13 +251,14 @@ class Phoneme(object):
     >>> t.airflow
     Feature('', 'X', '', 0)
     """
-    def __init__(self, features, representation=''):
+
+    def __init__(self, features: Set[Feature], representation: str = '') -> None:
         self.features = features
         self.representation = representation
-        self.categories = sorted(feature.category for feature in features)
+        self.categories = sorted(feature.category for feature in self.features)
         self._redefine_name_and_category_attributes()
 
-    def _redefine_name_and_category_attributes(self):
+    def _redefine_name_and_category_attributes(self) -> None:
         for category in feature_categories:
             similar_features = [ft for ft in self.features if ft.category == category]
             setattr(self, f'{category}s', similar_features)
@@ -263,90 +270,91 @@ class Phoneme(object):
             feature_names.append(f_name)
         self.name = " ".join([name for name in feature_names if name != ''])
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         args = f"{self.features}, representation='{self.representation}'"
         return f"{colored(self.__class__.__name__).yellow()}({args})"
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return self.representation"""
         return self.representation
 
-    def __eq__(self, other):
+    def __eq__(self, other: 'Phoneme') -> bool:
         return isinstance(other, self.__class__) and self.features == other.features
 
-    def __ne__(self, other):
+    def __ne__(self, other: 'Phoneme') -> bool:
         return not isinstance(other, self.__class__) or self.features != other.features
 
-    def __lt__(self, other):
+    def __lt__(self, other: 'Phoneme') -> bool:
         return hash(self.name) < hash(other.name)
 
-    def __le__(self, other):
+    def __le__(self, other: 'Phoneme') -> bool:
         return hash(self.name) <= hash(other.name)
 
-    def __gt__(self, other):
+    def __gt__(self, other: 'Phoneme') -> bool:
         return hash(self.name) > hash(other.name)
 
-    def __ge__(self, other):
+    def __ge__(self, other: 'Phoneme') -> bool:
         return hash(self.name) >= hash(other.name)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.name)
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> Feature:
         """Return self.features[index]"""
         return sorted(self.features)[index]
 
-    def __contains__(self, item):
+    def __contains__(self, item: Union[Feature, Iterable[Feature]]) -> bool:
         if isinstance(item, Feature):
             return item in self.features
         elif isinstance(item, Iterable):
             return all(f in self.features for f in item)
         return False
 
-    def __sub__(self, other):
-        """Return set of fetures that are in this phoneme and not in other"""
+    def __sub__(self, other: 'Phoneme') -> Set[Feature]:
+        """Return set of features that are in this phoneme and not in other"""
         return self.features - other.features
 
-    def __and__(self, other):
+    def __and__(self, other: 'Phoneme') -> Set[Feature]:
         """Return a union of features set from this and other phoneme"""
         return self.features & other.features
 
-    def __or__(self, other):
+    def __or__(self, other: 'Phoneme') -> Set[Feature]:
         """Return an intersection of features set from this and other phoneme"""
         return self.features | other.features
 
-    def __xor__(self, other):
+    def __xor__(self, other: 'Phoneme') -> Set[Feature]:
         """Return set of features that are in this or the other phoneme but not in both"""
         return self.features ^ other.features
 
-    def add(self, feature, redefine=True):
+    def add(self, feature: Feature, redefine: bool = True) -> None:
         """Add a feature to the features of this phoneme."""
         self.features.add(feature)
         if redefine:
             self._redefine_name_and_category_attributes()
 
-    def remove(self, feature, redefine=True):
+    def remove(self, feature: Feature, redefine: bool = True) -> None:
         """Remove a feature from the features of this phoneme."""
         if feature in self.features:
             self.features.remove(feature)
         if redefine:
             self._redefine_name_and_category_attributes()
 
-    def replace(self, feature1, feature2, redefine=True):
+    def replace(self, feature1: Feature, feature2: Feature, redefine: bool = True) -> None:
         if feature1 in self:
             self.remove(feature1, redefine=False)
             self.add(feature2, redefine=False)
         if redefine:
             self._redefine_name_and_category_attributes()
 
-    def set_place(self, feature, redefine=True):
+    def set_place(self, feature: Feature, redefine: bool = True) -> None:
         """Set an articulation place of this phoneme to given feature."""
         for place_feature in self.places:
             self.remove(place_feature)
         self.add(feature)
-        self._redefine_name_and_category_attributes()
+        if redefine:
+            self._redefine_name_and_category_attributes()
 
-    def advance(self, redefine=True):
+    def advance(self, redefine: bool = True) -> None:
         for place_feature in self.places:
             if place_feature == fts['PA']:
                 self.add(fts['AL'], redefine=False)
@@ -361,31 +369,31 @@ class Phoneme(object):
         if redefine:
             self._redefine_name_and_category_attributes()
 
-    def lower(self, redefine=True):
+    def lower(self, redefine: bool = True) -> None:
         for manner_feature in self.manners:
             replace_with = fts[ipa_rules['lower'][manner_feature.code]]
             self.replace(manner_feature, replace_with, redefine=False)
         if redefine:
             self._redefine_name_and_category_attributes()
 
-    def upper(self, redefine=True):
+    def upper(self, redefine: bool = True) -> None:
         for manner_feature in self.manners:
             replace_with = fts[ipa_rules['upper'][manner_feature.code]]
             self.replace(manner_feature, replace_with, redefine=False)
         if redefine:
             self._redefine_name_and_category_attributes()
 
-    def dentalize(self, redefine=True):
+    def dentalize(self, redefine: bool = True) -> None:
         for manner_feature in self.places:
             replace_with = fts[ipa_rules['dentalize'][manner_feature.code]]
             self.replace(manner_feature, replace_with, redefine=False)
         if redefine:
             self._redefine_name_and_category_attributes()
 
-    def is_vowel(self):
-        return {fts[f_code] for f_code in feature_subsets['vowel_manners']} & self.features
+    def is_vowel(self) -> bool:
+        return len({fts[f_code] for f_code in feature_subsets['vowel_manners']} & self.features) > 0
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Return a number of features that this phoneme has."""
         return len(self.features)
 
@@ -475,82 +483,83 @@ class Lexeme(object):
     >>> da.representation
     'da'
     """
-    def __init__(self, phonemes, meaning='', language_code=''):
+
+    def __init__(self, phonemes: List[Phoneme], meaning: str = '', language_code: str = '') -> None:
         self.phonemes = phonemes
         self.meaning = meaning
         self.language_code = language_code
         self._redefine_name()
         self._redefine_representation()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         args = f"{self.phonemes}, meaning='{self.meaning}', language_code='{self.language_code}'"
         return f"{colored(self.__class__.__name__).green()}({args})"
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return self.representation"""
         return self.representation
 
-    def __eq__(self, other):
+    def __eq__(self, other: 'Lexeme') -> bool:
         return isinstance(other, self.__class__) and self.phonemes == other.phonemes
 
-    def __ne__(self, other):
+    def __ne__(self, other: 'Lexeme') -> bool:
         return not isinstance(other, self.__class__) or self.phonemes != other.phonemes
 
-    def __lt__(self, other):
+    def __lt__(self, other: 'Lexeme') -> bool:
         return hash(self.name) < hash(other.name)
 
-    def __le__(self, other):
+    def __le__(self, other: 'Lexeme') -> bool:
         return hash(self.name) <= hash(other.name)
 
-    def __gt__(self, other):
+    def __gt__(self, other: 'Lexeme') -> bool:
         return hash(self.name) > hash(other.name)
 
-    def __ge__(self, other):
+    def __ge__(self, other: 'Lexeme') -> bool:
         return hash(self.name) >= hash(other.name)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.name)
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> Phoneme:
         """Return self.phonemes[index]"""
         return self.phonemes.__getitem__(index)
 
-    def __setitem__(self, index, item):
+    def __setitem__(self, index: int, item: Phoneme) -> None:
         """self.phonemes[index] = item"""
         self.phonemes.__setitem__(index, item)
         self._redefine_name()
         self._redefine_representation()
 
-    def __delitem__(self, index):
+    def __delitem__(self, index: int) -> None:
         """del self.phonemes[index]"""
         self.phonemes.__delitem__(index)
         self._redefine_name()
         self._redefine_representation()
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Return len(self.phonemes)"""
         return self.phonemes.__len__()
 
-    def __contains__(self, item):
-        """Return item in selt.phonemes"""
+    def __contains__(self, item: Phoneme) -> bool:
+        """Return item in self.phonemes"""
         return item in self.phonemes
 
-    def insert(self, index, item):
+    def insert(self, index: int, item: Phoneme) -> None:
         """self.phonemes.insert(index, item)"""
         self.phonemes.insert(index, item)
         self._redefine_name()
         self._redefine_representation()
 
-    def append(self, item):
+    def append(self, item: 'Phoneme') -> None:
         """self.phonemes.append(item)"""
         self.phonemes.append(item)
         self._redefine_name()
         self._redefine_representation()
 
-    def _redefine_name(self):
+    def _redefine_name(self) -> None:
         self.name = ", ".join([phoneme.name for phoneme in self.phonemes])
 
-    def _redefine_representation(self):
+    def _redefine_representation(self) -> None:
         self.representation = ''.join([phoneme.representation for phoneme in self.phonemes])
 
 
@@ -647,7 +656,10 @@ class Language(object):
     'airflow', 42), Feature('Palatal', 'PA', 'place', 28)}, representation='a')]
     , meaning='and', language_code='ka')
     """
-    def __init__(self, name, code, lexemes=[]):
+
+    def __init__(self, name: str, code: str, lexemes: List[Lexeme] = None) -> None:
+        if lexemes is None:
+            lexemes = []
         self.name = name
         self.code = code
         self.lexemes = lexemes
@@ -657,42 +669,42 @@ class Language(object):
         self.parent_edge = None
         self.child_edges = []
 
-    def _redefine_lexemes_dict(self):
+    def _redefine_lexemes_dict(self) -> None:
         self.lexemes_dict = {lexeme.meaning: lexeme for lexeme in self.lexemes}
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         args = f"'{self.name}', '{self.code}', {self.lexemes}"
         return f"{colored(self.__class__.__name__).blue()}({args})"
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return name, code and the vocabulary of this language"""
         return f"name: {self.name}, code: {self.code}, vocabulary: {self.get_vocabulary()}"
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: Union[int, str]) -> Lexeme:
         """Return self.lexemes[index]"""
         if isinstance(index, int):
             return self.lexemes.__getitem__(index)
         else:
             return self.lexemes_dict.__getitem__(index)
 
-    def __setitem__(self, index, item):
+    def __setitem__(self, index: int, item: Lexeme) -> None:
         """self.lexemes[index] = item"""
         meaning = self.lexemes.__getitem__(index).meaning
         self.lexemes_dict.__delitem__(meaning)
         self.lexemes.__setitem__(index, item)
         self.lexemes_dict[item.meaning] = item
 
-    def __delitem__(self, index):
+    def __delitem__(self, index: int) -> None:
         """del self.lexemes[index]"""
         meaning = self.lexemes.__getitem__(index).meaning
         self.lexemes_dict.__delitem__(meaning)
         self.lexemes.__delitem__(index)
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Return len(self.lexemes)"""
         return self.lexemes.__len__()
 
-    def __contains__(self, item):
+    def __contains__(self, item: Union[Lexeme, str]) -> bool:
         """Return item in self.lexemes"""
         if isinstance(item, Lexeme):
             return item in self.lexemes
@@ -700,45 +712,45 @@ class Language(object):
             return item in self.lexemes_dict
         return False
 
-    def __and__(self, other):
+    def __and__(self, other: 'Language') -> Set[str]:
         """Return a set of word meanings that are in both languages"""
         return set(self.lexemes_dict) & set(other.lexemes_dict)
 
-    def __or__(self, other):
+    def __or__(self, other: 'Language') -> Set[str]:
         """Return a set of word meanings that are in any of these languages"""
         return set(self.lexemes_dict) | set(other.lexemes_dict)
 
-    def insert(self, index, item):
+    def insert(self, index: int, item: Lexeme) -> None:
         """self.lexemes.insert(index, item)"""
         self.lexemes.insert(index, item)
 
-    def append(self, item):
+    def append(self, item: Lexeme) -> None:
         """self.lexemes.append(item)"""
         self.lexemes.append(item)
 
-    def get_vocabulary(self):
+    def get_vocabulary(self) -> List[str]:
         """Return a list of words this language contains in the IPA trancription."""
         return [str(lexeme) for lexeme in self.lexemes]
 
-    def get_dictionary(self):
+    def get_dictionary(self) -> Dict[str, str]:
         """Return a dictionary of the words this language contains with keys in
         English and values with IPA transcriptions of these words."""
         return self.lexemes_dict
 
-    def get_parent_language(self):
+    def get_parent_language(self) -> 'Language':
         """Return a parent language of this language if set, otherwise return None."""
         return self.parent_edge.parent_language if self.parent_edge else None
 
-    def get_child_languages(self):
+    def get_child_languages(self) -> List['Language']:
         """Return a list of child languages that this language has"""
         return [edge.child_language for edge in self.child_edges]
 
-    def is_leaf(self):
+    def is_leaf(self) -> bool:
         """Check if this language is a leaf node in the tree (has no child
         languages)"""
         return len(self.child_edges) == 0
 
-    def is_root(self):
+    def is_root(self) -> bool:
         """Check if this language is a root node in the tree (has no parent
         language)"""
         return self.parent_edge is None
