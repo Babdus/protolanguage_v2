@@ -1,5 +1,7 @@
 from typing import Any, Callable, List, Dict
+
 import pandas as pd
+
 from linguistics import Language
 
 

@@ -1,15 +1,17 @@
-from linguistics import Language, Phoneme, empty_phoneme
-from structures import NamedMatrix, Tree, Edge
-from comparison import calculate_phoneme_distance, calculate_language_distance
-from pickles import asymmetric_feature_distance_map as afdm
-import parser
-import pandas as pd
-import numpy as np
-from munkres import Munkres
-from log_functions import colored
 from typing import List
 
+import numpy as np
+import pandas as pd
+from munkres import Munkres
 
+import parser
+from comparison import calculate_phoneme_distance, calculate_language_distance
+from linguistics import Language, empty_phoneme
+from log_functions import Colored, timing
+from structures import NamedMatrix, Tree, Edge
+
+
+@timing
 def construct_languages(catalogue_path, min_words=40):
     df = pd.read_csv(catalogue_path, index_col='Code')
     df = df[df.index.notnull()]
@@ -30,35 +32,38 @@ def construct_languages(catalogue_path, min_words=40):
             try:
                 lexeme = parser.ipa_string_to_lexeme(word, meaning, language_code)
             except ValueError as e:
-                print(colored(str(e)).red().bold(), word, meaning, language_name)
-            lexemes.append(lexeme)
+                print(Colored(str(e)).red().bold(), word, meaning, language_name)
+            else:
+                lexemes.append(lexeme)
         languages.append(Language(language_name, language_code, lexemes=lexemes))
     return languages
 
 
+@timing
 def construct_phoneme_distance_matrix(
         languages: List[Language],
         csv_path: str = None
-    ) -> NamedMatrix:
-    munk = Munkres()
-    all_phonemes = sorted(list({phon for lang in languages for lex in lang for phon in lex}))
+) -> NamedMatrix:
+    munkres = Munkres()
+    all_phonemes = sorted(list({phone for lang in languages for lex in lang for phone in lex}))
     all_phonemes.append(empty_phoneme)
     matrix = NamedMatrix(
         column_names=all_phonemes,
         row_names=all_phonemes,
         function=calculate_phoneme_distance,
-        args=[munk]
+        args=[munkres]
     )
     if csv_path:
         matrix.to_csv(csv_path)
     return matrix
 
 
+@timing
 def construct_language_distance_matrix(
         languages: List[Language],
         pdm: NamedMatrix,
         csv_path: str = None
-    ) -> NamedMatrix:
+) -> NamedMatrix:
     language_codes = list(map(lambda l: l.code, languages))
     matrix = NamedMatrix(
         column_names=language_codes,
@@ -73,26 +78,28 @@ def construct_language_distance_matrix(
     return matrix
 
 
+@timing
 def construct_tree(
         ldm: NamedMatrix
-    ) -> Tree:
+) -> Tree:
     language_codes = ldm.column_names.copy()
     languages = ldm.column_items.copy()
     n = len(language_codes)
     delta = {}
     d = np.array(ldm.get_inner_matrix())
+    ij_language = None
 
     while n > 1:
-        #1 Compute Q matrix
-        Q = (d * (n-2)) - np.sum(d, axis=0).reshape(1, n) - np.sum(d, axis=1).reshape(n, 1)
+        # 1 Compute Q matrix
+        Q = (d * (n - 2)) - np.sum(d, axis=0).reshape(1, n) - np.sum(d, axis=1).reshape(n, 1)
         np.fill_diagonal(Q, 0)
 
-        #2 Find pair with minimal value in Q
+        # 2 Find pair with minimal value in Q
         i, j = np.unravel_index(Q.argmin(), Q.shape)
 
-        #3 Create parent node for minimal found pair and assign edge lengths
-        ij_name = language_codes[i]+'.'+language_codes[j]
-        dist_i_ij = d[i, j]/2 + ( ( np.sum(d[i]) - np.sum(d[j]) )/(2*(n-2)) if n != 2 else 0 )
+        # 3 Create parent node for minimal found pair and assign edge lengths
+        ij_name = str(language_codes[i]) + '.' + str(language_codes[j])
+        dist_i_ij = d[i, j] / 2 + ((np.sum(d[i]) - np.sum(d[j])) / (2 * (n - 2)) if n != 2 else 0)
         dist_j_ij = d[i, j] - dist_i_ij
 
         delta[(language_codes[i], ij_name)] = dist_i_ij
@@ -117,19 +124,19 @@ def construct_tree(
         languages[j].parent_edge = edge_ij_j
         ij_language.child_edges = [edge_ij_i, edge_ij_j]
 
-        #4 Calculate distances to other nodes from new one
-        dists_to_ij = (d[i] + d[j] - d[i, j])/2
+        # 4 Calculate distances to other nodes from new one
+        dists_to_ij = (d[i] + d[j] - d[i, j]) / 2
 
-        #5 Add row and column to d for new node
-        d_new = np.zeros((n+1, n+1))
+        # 5 Add row and column to d for new node
+        d_new = np.zeros((n + 1, n + 1))
         d_new[:-1, :-1] = d
         d = d_new
 
-        #6 Set new distances to the new node in d
+        # 6 Set new distances to the new node in d
         d[:-1, -1] = dists_to_ij
         d[-1, :-1] = dists_to_ij
 
-        #6 Remove columns and rows for already parented nodes
+        # 6 Remove columns and rows for already parented nodes
         d = np.delete(d, (i, j), axis=0)
         d = np.delete(d, (i, j), axis=1)
 
@@ -146,4 +153,4 @@ def construct_tree(
 
         n = len(language_codes)
 
-    return Tree(root_language=ij_language)
+    return Tree(root_language=ij_language) if ij_language is not None else None

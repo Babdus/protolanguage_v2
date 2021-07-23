@@ -4,7 +4,7 @@ import pickle
 from collections import Iterable
 from typing import Any, Set, Union, List, Dict
 
-from log_functions import colored
+from log_functions import Colored
 from pickles import asymmetric_feature_distance_map as afdm
 from pickles import feature_categories, features_info, ipa_rules, feature_subsets
 
@@ -16,7 +16,7 @@ def save(obj: Any, path: str):
 
 def load(path: str):
     with open(path, 'wb') as f:
-        obj = pickle.load('path')
+        obj = pickle.load(f)
     return obj
 
 
@@ -106,7 +106,7 @@ class Feature(object):
 
     def __repr__(self) -> str:
         args = f"'{self.name}', '{self.code}', '{self.category}', {self.index}"
-        return f"{colored(self.__class__.__name__).cyan()}({args})"
+        return f"{Colored(self.__class__.__name__).cyan()}({args})"
 
     def __eq__(self, other: 'Feature') -> bool:
         return isinstance(other, self.__class__) and self.code == other.code
@@ -272,7 +272,7 @@ class Phoneme(object):
 
     def __repr__(self) -> str:
         args = f"{self.features}, representation='{self.representation}'"
-        return f"{colored(self.__class__.__name__).yellow()}({args})"
+        return f"{Colored(self.__class__.__name__).yellow()}({args})"
 
     def __str__(self) -> str:
         """Return self.representation"""
@@ -493,7 +493,7 @@ class Lexeme(object):
 
     def __repr__(self) -> str:
         args = f"{self.phonemes}, meaning='{self.meaning}', language_code='{self.language_code}'"
-        return f"{colored(self.__class__.__name__).green()}({args})"
+        return f"{Colored(self.__class__.__name__).green()}({args})"
 
     def __str__(self) -> str:
         """Return self.representation"""
@@ -674,7 +674,7 @@ class Language(object):
 
     def __repr__(self) -> str:
         args = f"'{self.name}', '{self.code}', {self.lexemes}"
-        return f"{colored(self.__class__.__name__).blue()}({args})"
+        return f"{Colored(self.__class__.__name__).blue()}({args})"
 
     def __str__(self) -> str:
         """Return name, code and the vocabulary of this language"""
@@ -729,7 +729,7 @@ class Language(object):
         self.lexemes.append(item)
 
     def get_vocabulary(self) -> List[str]:
-        """Return a list of words this language contains in the IPA trancription."""
+        """Return a list of words this language contains in the IPA transcription."""
         return [str(lexeme) for lexeme in self.lexemes]
 
     def get_dictionary(self) -> Dict[str, str]:

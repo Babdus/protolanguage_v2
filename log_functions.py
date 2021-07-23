@@ -1,5 +1,11 @@
-class colored(object):
-    def __init__(self, s, features=[]):
+from functools import wraps
+from time import time
+
+
+class Colored(object):
+    def __init__(self, s, features=None):
+        if features is None:
+            features = []
         self.features = features
         self.string = s
 
@@ -7,7 +13,7 @@ class colored(object):
         return '\033[' + ';'.join(self.features) + 'm' + self.string + '\033[0m'
 
     def generic_method(self, value):
-        return colored(self.string, features=self.features+[str(value)])
+        return Colored(self.string, features=self.features + [str(value)])
 
     def black(self):
         return self.generic_method(30)
@@ -53,3 +59,15 @@ class colored(object):
 
     def strike(self):
         return self.generic_method(9)
+
+
+def timing(f):
+    @wraps(f)
+    def wrap(*args, **kw):
+        ts = time()
+        result = f(*args, **kw)
+        te = time()
+        print('\033[36;1m', f'func:{f.__name__} took: {te - ts:.4f} sec', '\033[0m')
+        return result
+
+    return wrap
