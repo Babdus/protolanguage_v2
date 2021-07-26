@@ -42,7 +42,8 @@ def construct_languages(catalogue_path, min_words=40):
 @timing
 def construct_phoneme_distance_matrix(
         languages: List[Language],
-        csv_path: str = None
+        csv_path: str = None,
+        vectorize: bool = False
 ) -> NamedMatrix:
     munkres = Munkres()
     all_phonemes = sorted(list({phone for lang in languages for lex in lang for phone in lex}))
@@ -52,7 +53,8 @@ def construct_phoneme_distance_matrix(
         row_names=all_phonemes,
         function=calculate_phoneme_distance,
         args=[munkres],
-        name='pdm'
+        name='pdm',
+        vectorize=vectorize
     )
     if csv_path:
         matrix.to_csv(csv_path)
@@ -63,7 +65,8 @@ def construct_phoneme_distance_matrix(
 def construct_language_distance_matrix(
         languages: List[Language],
         pdm: NamedMatrix,
-        csv_path: str = None
+        csv_path: str = None,
+        vectorize: bool = False
 ) -> NamedMatrix:
     language_codes = list(map(lambda l: l.code, languages))
     matrix = NamedMatrix(
@@ -73,7 +76,8 @@ def construct_language_distance_matrix(
         args=[pdm],
         column_items=languages,
         row_items=languages,
-        name='ldm'
+        name='ldm',
+        vectorize=vectorize
     )
     if csv_path:
         matrix.to_csv(csv_path)

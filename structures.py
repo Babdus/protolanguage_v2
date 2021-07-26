@@ -59,7 +59,8 @@ class NamedMatrix(object):
             column_items: List[Any] = None,
             row_items: List[Any] = None,
             name: str = None,
-            printing: bool = False
+            printing: bool = False,
+            vectorize: bool = False
     ) -> None:
         self.name = self.__name__ if name is None else name
         if kwargs is None:
@@ -76,19 +77,22 @@ class NamedMatrix(object):
         self.np_row_items = np.array(self.row_items, dtype=object)
         self.np_column_items = np.array(self.column_items, dtype=object)
 
-        self.broadcast_function = np.frompyfunc(function, 2 + len(args) + len(kwargs), 1)
-        self.matrix = self.broadcast_function(self.np_row_items, self.np_column_items[:, None], *args, **kwargs)
+        if vectorize:
+            self.broadcast_function = np.frompyfunc(function, 2 + len(args) + len(kwargs), 1)
+            self.matrix = self.broadcast_function(self.np_row_items, self.np_column_items[:, None], *args, **kwargs)
+        else:
+            self.matrix = np.array([[function(row_item, column_item, *args, **kwargs) for row_item in self.np_row_items] for column_item in self.np_column_items])
 
-    def getitem(self, row_index: Any, column_index: Any) -> Any:
-        return self.matrix[self.row_index_map[row_index], self.column_index_map[column_index]]
+    def __getitem__(self, index: Tuple[Any, Any]) -> Any:
+        return self.matrix[self.row_index_map[index[0]], self.column_index_map[index[1]]]
 
-    def setitem(self, row_index: Any, column_index: Any, item: Any) -> None:
-        self.matrix[self.row_index_map[row_index], self.column_index_map[column_index]] = item
+    def __setitem__(self, index: Tuple[Any, Any], item: Any) -> None:
+        self.matrix[self.row_index_map[index[0]], self.column_index_map[index[1]]] = item
 
-    def delitem(self, row_index: Any, column_index: Any,) -> None:
-        del self.matrix[self.row_index_map[row_index], self.column_index_map[column_index]]
+    def __delitem__(self, index: Tuple[Any, Any]) -> None:
+        del self.matrix[self.row_index_map[index[0]], self.column_index_map[index[1]]]
 
-    def len(self) -> int:
+    def __len__(self) -> int:
         return len(self.matrix)
 
     def shape(self) -> Tuple[int, int]:
