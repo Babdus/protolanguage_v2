@@ -27,23 +27,24 @@ def calculate_lexeme_distance(
 ) -> Tuple[float, Lexeme, Lexeme]:
     matrix = np.zeros((len(source_lexeme) + 1, len(target_lexeme) + 1))
     for i, source_phoneme in enumerate(source_lexeme):
-        matrix[i + 1, 0] = matrix[i, 0] + phoneme_distance_matrix[source_phoneme][empty_phoneme]
+        matrix[i + 1, 0] = matrix[i, 0] + phoneme_distance_matrix.getitem(source_phoneme, empty_phoneme)
     for j, target_phoneme in enumerate(target_lexeme):
-        matrix[0, j + 1] = matrix[0, j] + phoneme_distance_matrix[empty_phoneme][target_phoneme]
+        matrix[0, j + 1] = matrix[0, j] + phoneme_distance_matrix.getitem(empty_phoneme, target_phoneme)
     for j, target_phoneme in enumerate(target_lexeme):
         for i, source_phoneme in enumerate(source_lexeme):
             matrix[i + 1, j + 1] = min(
-                matrix[i, j + 1] + phoneme_distance_matrix[source_phoneme][empty_phoneme],
-                matrix[i + 1, j] + phoneme_distance_matrix[empty_phoneme][target_phoneme],
-                matrix[i, j] + phoneme_distance_matrix[source_phoneme][target_phoneme]
+                matrix[i, j + 1] + phoneme_distance_matrix.getitem(source_phoneme, empty_phoneme),
+                matrix[i + 1, j] + phoneme_distance_matrix.getitem(empty_phoneme, target_phoneme),
+                matrix[i, j] + phoneme_distance_matrix.getitem(source_phoneme, target_phoneme)
             )
     return matrix[-1][-1], source_lexeme, target_lexeme
 
 
 def calculate_language_distance(lang_1, lang_2, pdm):
-    pool = Pool(cpu_count())
-    args = [(lang_1[word], lang_2[word], pdm) for word in lang_1 & lang_2]
-    dists = pool.starmap(calculate_lexeme_distance, args)
-    pool.close()
+    dists = [calculate_lexeme_distance(lang_1[word], lang_2[word], pdm) for word in lang_1 & lang_2]
+    # pool = Pool(1)
+    # args = [(lang_1[word], lang_2[word], pdm) for word in lang_1 & lang_2]
+    # dists = pool.starmap(calculate_lexeme_distance, args)
+    # pool.close()
     scaled_dists = [dist / (len(lex1) + len(lex2)) for dist, lex1, lex2 in dists]
     return sum(scaled_dists) / len(scaled_dists)

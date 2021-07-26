@@ -51,7 +51,8 @@ def construct_phoneme_distance_matrix(
         column_names=all_phonemes,
         row_names=all_phonemes,
         function=calculate_phoneme_distance,
-        args=[munkres]
+        args=[munkres],
+        name='pdm'
     )
     if csv_path:
         matrix.to_csv(csv_path)
@@ -71,7 +72,8 @@ def construct_language_distance_matrix(
         function=calculate_language_distance,
         args=[pdm],
         column_items=languages,
-        row_items=languages
+        row_items=languages,
+        name='ldm'
     )
     if csv_path:
         matrix.to_csv(csv_path)
@@ -105,6 +107,7 @@ def construct_tree(
         delta[(language_codes[i], ij_name)] = dist_i_ij
         delta[(language_codes[j], ij_name)] = dist_j_ij
 
+        # 3.1 Create parent language object and connect it with its children languages
         ij_language = Language(ij_name, ij_name)
 
         language_codes.append(ij_name)
