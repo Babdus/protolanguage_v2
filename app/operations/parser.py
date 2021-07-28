@@ -1,6 +1,8 @@
-import linguistics as ln
-from log_functions import Colored
-from pickles import replace, letters, modifiers, ignore
+from app.data.features import features_cache
+from app.data.pickles import replace, letters, modifiers, ignore
+from app.models.lexeme import Lexeme
+from app.models.phoneme import Phoneme
+from app.utils.colors import Colored
 
 
 def replace_non_ipa(string):
@@ -42,14 +44,14 @@ def group_single_phoneme_symbols(symbols):
 def symbol_to_phoneme(symbol):
     feature_codes = letters[symbol['letter']]
     representation = f"{symbol['letter']}{''.join(symbol['modifiers'])}"
-    features = {ln.features_cache[code] for code in feature_codes}
-    phoneme = ln.Phoneme(features, representation=representation)
+    features = {features_cache[code] for code in feature_codes}
+    phoneme = Phoneme(features, representation=representation)
     for modifier in symbol['modifiers']:
         modifier_info = modifiers[modifier]
         actions = modifier_info['actions']
         for action, arg_feature_code in actions:
             if len(arg_feature_code) > 0:
-                arg_feature = ln.features_cache[arg_feature_code]
+                arg_feature = features_cache[arg_feature_code]
                 getattr(phoneme, action)(arg_feature)
             else:
                 getattr(phoneme, action)()
@@ -65,7 +67,7 @@ def ipa_string_to_lexeme(ipa_string, meaning, language_code):
     except KeyError as e:
         print(Colored(str(e)).red(), Colored(ipa_string).green(), Colored(str(ipa_gathered_symbols)).magenta())
     else:
-        lexeme = ln.Lexeme(phonemes, meaning=meaning, language_code=language_code)
+        lexeme = Lexeme(phonemes, meaning=meaning, language_code=language_code)
         return lexeme
 
 
@@ -73,9 +75,3 @@ def phoneme_to_ipa_symbol(phoneme):
     if phoneme.representation != '':
         return phoneme.representation
     pass
-
-# lexeme = ipa_string_to_lexeme(sys.argv[1], '', 'tmp')
-# print(repr(lexeme))
-# print(str(lexeme))
-# print(lexeme.name)
-# ln.save(lexeme, 'temp_lexeme.pickle')

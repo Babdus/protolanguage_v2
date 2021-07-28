@@ -1,11 +1,4 @@
-import pickle
-
-
-def read_pickle(path):
-    with open(path, 'rb') as f:
-        obj = pickle.load(f)
-    return obj
-
+from app.utils.io import read_pickle
 
 replace = read_pickle('data/pickles/ipa_char_replace_dict.pickle')
 letters = read_pickle('data/pickles/ipa_letters_dicts.pickle')
