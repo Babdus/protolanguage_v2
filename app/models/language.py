@@ -1,8 +1,8 @@
 from typing import List, Union, Set, Dict
 
-from app.models.feature import Feature
-from app.models.lexeme import Lexeme
-from app.models.phoneme import Phoneme
+from .feature import Feature
+from .lexeme import Lexeme
+from .phoneme import Phoneme
 from app.utils.colors import Colored
 
 

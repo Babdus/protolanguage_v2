@@ -1,4 +1,4 @@
-from app.models.language import Language
+from .language import Language
 
 
 class Edge(object):

@@ -2,7 +2,7 @@ from typing import Set, Union, Iterable
 
 from app.data.features import features_cache as fts
 from app.data.pickles import feature_categories, ipa_rules, feature_subsets
-from app.models.feature import Feature
+from .feature import Feature
 from app.utils.colors import Colored
 
 
