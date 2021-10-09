@@ -1,8 +1,7 @@
 var path = "../data/generated/tree.json"
     d3.json(path, function(error, data) {
         var width = 900,
-            height = 900,
-            nodeRadius = 4;
+            height = 900;
 
         var svg = d3.select('body')
             .append('svg')
@@ -46,10 +45,7 @@ var path = "../data/generated/tree.json"
                         return "M" + sx + " " + sy + " " + "A" + d.source.y + " " + d.source.y + " 0 0 0 " + ax + " " + ay + "L" + tx + " " + ty;
                     else
                         return "M" + tx + " " + ty + " " + "L" + ax + " " + ay + "A" + d.source.y + " " + d.source.y + " 0 0 0 " + sx + " " + sy;
-                },
-                fill: 'none',
-                stroke: '#ccc',
-                'stroke-width': 3
+                }
             });
 
         var nodeGroups = mainGroup.selectAll("g")
@@ -62,10 +58,7 @@ var path = "../data/generated/tree.json"
 
         nodeGroups.append("circle")
             .attrs({
-                r: nodeRadius,
-                fill: '#fff',
-                stroke: 'steelblue',
-                'stroke-width': 3
+                fill: function(d) { return d.data.children.length == 0 ? "#DF6757" : "#FAC72E" }
             });
 
         nodeGroups.append("text")
@@ -81,6 +74,5 @@ var path = "../data/generated/tree.json"
                     return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)";
                 }
             })
-            .style('font', '14px sans-serif')
             .text(function(d) { return d.data.children.length == 0 ? d.data.name : '' });
     });

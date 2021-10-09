@@ -1,0 +1,30 @@
+circle {
+    r: 4px;
+    stroke-width: 1px;
+    stroke: black;
+}
+
+circle:hover {
+    r: 8px;
+    cursor: pointer;
+}
+
+path {
+    stroke-width: 1px;
+    stroke: black;
+    fill: none;
+}
+
+path:hover {
+    stroke-width: 2px;
+    cursor: pointer;
+}
+
+text {
+    font: 14px sans-serif;
+}
+
+text:hover {
+    font-weight: bold;
+    cursor: pointer;
+}
