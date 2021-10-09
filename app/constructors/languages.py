@@ -3,6 +3,7 @@ from typing import List
 import pandas as pd
 
 from app.models.language import Language
+from app.models.tree import Tree
 from app.models.named_matrix import NamedMatrix
 from app.operations.language import calculate_language_distance
 from app.operations.parser import ipa_string_to_lexeme
@@ -59,3 +60,10 @@ def construct_language_distance_matrix(
     if csv_path:
         matrix.to_csv(csv_path)
     return matrix
+
+
+@timing
+def reconstruct_protolanguages(
+        tree: Tree
+):
+    pass

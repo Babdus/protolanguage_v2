@@ -2,7 +2,7 @@ var path = "../data/generated/tree.json"
     d3.json(path, function(error, data) {
         var width = 900,
             height = 900,
-            nodeRadius = 8;
+            nodeRadius = 4;
 
         var svg = d3.select('body')
             .append('svg')
@@ -16,7 +16,7 @@ var path = "../data/generated/tree.json"
             .attr("transform", "translate(" + radius + "," + radius + ")");
 
         var cluster = d3.cluster()
-            .size([360, radius - 100]);
+            .size([360, radius - 120]);
 
         //  assigns the data to a hierarchy using parent-child relationships
         var root = d3.hierarchy(data, function(d) {
@@ -34,9 +34,22 @@ var path = "../data/generated/tree.json"
             .enter()
             .append('path')
             .attrs({
-                d: linksGenerator,
+//                d: linksGenerator,
+                d: function(d) {
+                    sx = d.source.y * Math.cos((d.source.x - 90) / 180 * Math.PI)
+                    sy = d.source.y * Math.sin((d.source.x - 90) / 180 * Math.PI)
+                    tx = d.target.y * Math.cos((d.target.x - 90) / 180 * Math.PI)
+                    ty = d.target.y * Math.sin((d.target.x - 90) / 180 * Math.PI)
+                    ax = d.source.y * Math.cos((d.target.x - 90) / 180 * Math.PI)
+                    ay = d.source.y * Math.sin((d.target.x - 90) / 180 * Math.PI)
+                    if(d.source.x > d.target.x)
+                        return "M" + sx + " " + sy + " " + "A" + d.source.y + " " + d.source.y + " 0 0 0 " + ax + " " + ay + "L" + tx + " " + ty;
+                    else
+                        return "M" + tx + " " + ty + " " + "L" + ax + " " + ay + "A" + d.source.y + " " + d.source.y + " 0 0 0 " + sx + " " + sy;
+                },
                 fill: 'none',
                 stroke: '#ccc',
+                'stroke-width': 3
             });
 
         var nodeGroups = mainGroup.selectAll("g")
@@ -69,6 +82,5 @@ var path = "../data/generated/tree.json"
                 }
             })
             .style('font', '14px sans-serif')
-            .style('margin', '5px')
             .text(function(d) { return d.data.children.length == 0 ? d.data.name : '' });
     });
