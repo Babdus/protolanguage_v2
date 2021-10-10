@@ -3,11 +3,10 @@ var path = "../data/generated/tree.json"
         var width = 900,
             height = 900;
 
-        var svg = d3.select('body')
+        var svg = d3.selectAll('.container')
             .append('svg')
             .attrs({
-                width: width,
-                height: height
+                viewBox: "0 0 900 900"
             });
 
         var radius = width / 2;
@@ -58,7 +57,7 @@ var path = "../data/generated/tree.json"
 
         nodeGroups.append("circle")
             .attrs({
-                fill: function(d) { return d.data.children.length == 0 ? "#DF6757" : "#FAC72E" }
+                class: function(d) { return d.data.children.length == 0 ? "leaf" : "parent" }
             });
 
         nodeGroups.append("text")

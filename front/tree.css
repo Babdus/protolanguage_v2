@@ -1,7 +1,46 @@
+:root {
+  --red: #df6757;
+  --yellow: #fac72e;
+  --purple: #9e82d8;
+}
+
+body {
+    margin: 0px;
+}
+
+.container {
+    margin: 0 calc((100vw - 89vh) / 2);
+}
+
+.header {
+    height: 10vh;
+    background: var(--purple);
+    color: var(--yellow);
+}
+
+.header p {
+    margin: auto;
+    font: bold 30px/10vh sans-serif;
+    text-align: center;
+}
+
+svg {
+    width: 89vh;
+    height: 89vh;
+}
+
 circle {
     r: 4px;
     stroke-width: 1px;
     stroke: black;
+}
+
+circle.leaf {
+    fill: var(--red);
+}
+
+circle.parent {
+    fill: var(--yellow);
 }
 
 circle:hover {
