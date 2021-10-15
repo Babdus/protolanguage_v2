@@ -9,24 +9,30 @@ body {
 }
 
 .container {
-    margin: 0 calc((100vw - min(89vh, 100vw)) / 2);
+    margin: 0 calc((100vw - min(max(89vh, 600px), 100vw)) / 2);
 }
 
 .header {
-    height: 10vh;
+    min-height: 67px;
+    max-height: 10vh;
+    min-width: 600px;
     background: var(--purple);
     color: var(--yellow);
 }
 
 .header p {
     margin: auto;
-    font: bold min(3vh, 3vw)/10vh sans-serif;
+    font: bold max(min(3vh, 3vw), 10px)/max(10vh, 67px) sans-serif;
     text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 svg {
-    width: min(89vh, 100vw);
-    height: min(89vh, 100vw);
+    min-width: 600px;
+    min-height: 600px;
+    max-width: min(89vh, 100vw);
+    max-height: min(89vh, 100vw);
 }
 
 circle {
