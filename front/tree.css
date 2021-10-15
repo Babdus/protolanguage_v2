@@ -9,7 +9,7 @@ body {
 }
 
 .container {
-    margin: 0 calc((100vw - 89vh) / 2);
+    margin: 0 calc((100vw - min(89vh, 100vw)) / 2);
 }
 
 .header {
@@ -20,13 +20,13 @@ body {
 
 .header p {
     margin: auto;
-    font: bold 30px/10vh sans-serif;
+    font: bold min(3vh, 3vw)/10vh sans-serif;
     text-align: center;
 }
 
 svg {
-    width: 89vh;
-    height: 89vh;
+    width: min(89vh, 100vw);
+    height: min(89vh, 100vw);
 }
 
 circle {
