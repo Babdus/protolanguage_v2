@@ -23,4 +23,12 @@ def recursive_printing_tree(root, spaces=''):
 
 
 def tree_to_dict(root):
-    return {'name': root.name, 'children': [tree_to_dict(lang) for lang in root.get_child_languages()]}
+    return {
+        'name': root.name,
+        'children': [
+            tree_to_dict(lang) for lang in root.get_child_languages()
+        ],
+        'dictionary': [
+            {lexeme.meaning: str(lexeme)} for lexeme in root
+        ]
+    }

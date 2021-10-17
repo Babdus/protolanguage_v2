@@ -1,7 +1,7 @@
 from typing import List, Union, Set, Dict
 
 from .feature import Feature
-from .lexeme import Lexeme
+from .lexeme import Lexeme, Synonyms
 from .phoneme import Phoneme
 from app.utils.colors import Colored
 
@@ -100,20 +100,21 @@ class Language(object):
     , meaning='and', language_code='ka')
     """
 
-    def __init__(self, name: str, code: str, lexemes: List[Lexeme] = None) -> None:
+    def __init__(self, name: str, code: str, lexemes: List[Union[Lexeme, Synonyms]] = None) -> None:
         if lexemes is None:
             lexemes = []
         self.name = name
         self.code = code
         self.lexemes = lexemes
         for lexeme in self.lexemes:
-            lexeme.language_code = code
+            lexeme.set_language_code(code)
         self._redefine_lexemes_dict()
         self.parent_edge = None
         self.child_edges = []
 
     def _redefine_lexemes_dict(self) -> None:
         self.lexemes_dict = {lexeme.meaning: lexeme for lexeme in self.lexemes}
+        self.lexeme_index_dict = {lexeme.meaning: i for i, lexeme in enumerate(self.lexemes)}
 
     def __repr__(self) -> str:
         args = f"'{self.name}', '{self.code}', {self.lexemes}"
@@ -123,25 +124,38 @@ class Language(object):
         """Return name, code and the vocabulary of this language"""
         return f"name: {self.name}, code: {self.code}, vocabulary: {self.get_vocabulary()}"
 
-    def __getitem__(self, index: Union[int, str]) -> Lexeme:
+    def __getitem__(self, index: Union[int, str]) -> Union[Lexeme, Synonyms]:
         """Return self.lexemes[index]"""
         if isinstance(index, int):
             return self.lexemes.__getitem__(index)
         else:
             return self.lexemes_dict.__getitem__(index)
 
-    def __setitem__(self, index: int, item: Lexeme) -> None:
+    def __setitem__(self, index: Union[int, str], item: Union[Lexeme, Synonyms]) -> None:
         """self.lexemes[index] = item"""
-        meaning = self.lexemes.__getitem__(index).meaning
-        self.lexemes_dict.__delitem__(meaning)
-        self.lexemes.__setitem__(index, item)
+        if isinstance(index, int):
+            meaning = self.lexemes.__getitem__(index).meaning
+        else:
+            meaning = index
+            if meaning in self.lexeme_index_dict:
+                index = self.lexeme_index_dict[meaning]
+            else:
+                index = len(self.lexemes)
+        if meaning in self.lexemes_dict:
+            self.lexemes_dict.__delitem__(meaning)
+        if index == len(self.lexemes):
+            self.lexemes.append(item)
+        else:
+            self.lexemes.__setitem__(index, item)
         self.lexemes_dict[item.meaning] = item
+        self.lexeme_index_dict[item.meaning] = index
 
     def __delitem__(self, index: int) -> None:
         """del self.lexemes[index]"""
         meaning = self.lexemes.__getitem__(index).meaning
         self.lexemes_dict.__delitem__(meaning)
         self.lexemes.__delitem__(index)
+        self.lexeme_index_dict = {lexeme.meaning: i for i, lexeme in enumerate(self.lexemes)}
 
     def __len__(self) -> int:
         """Return len(self.lexemes)"""
@@ -163,13 +177,15 @@ class Language(object):
         """Return a set of word meanings that are in any of these languages"""
         return set(self.lexemes_dict) | set(other.lexemes_dict)
 
-    def insert(self, index: int, item: Lexeme) -> None:
+    def insert(self, index: int, item: Union[Lexeme, Synonyms]) -> None:
         """self.lexemes.insert(index, item)"""
         self.lexemes.insert(index, item)
+        self._redefine_lexemes_dict()
 
-    def append(self, item: Lexeme) -> None:
+    def append(self, item: Union[Lexeme, Synonyms]) -> None:
         """self.lexemes.append(item)"""
         self.lexemes.append(item)
+        self._redefine_lexemes_dict()
 
     def get_vocabulary(self) -> List[str]:
         """Return a list of words this language contains in the IPA transcription."""

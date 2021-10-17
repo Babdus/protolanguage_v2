@@ -160,8 +160,69 @@ class Lexeme(object):
         self._redefine_name()
         self._redefine_representation()
 
+    def set_language_code(self, code: str) -> None:
+        self.language_code = code
+
     def _redefine_name(self) -> None:
         self.name = ", ".join([phoneme.name for phoneme in self.phonemes])
 
     def _redefine_representation(self) -> None:
         self.representation = ''.join([phoneme.representation for phoneme in self.phonemes])
+
+
+class Synonyms(object):
+    def __init__(self, lexemes: List[Lexeme]) -> None:
+        self.meaning = lexemes[0].meaning
+        self.lexemes = lexemes
+        self._redefine_representation()
+
+    def __repr__(self) -> str:
+        args = f"{self.lexemes}"
+        return f"{Colored(self.__class__.__name__).magenta()}({args})"
+
+    def __str__(self) -> str:
+        """Return self.representation"""
+        return self.representation
+
+    def __getitem__(self, index: int) -> Lexeme:
+        """Return self.lexemes[index]"""
+        return self.lexemes.__getitem__(index)
+
+    def __setitem__(self, index: int, item: Lexeme) -> None:
+        """self.lexemes[index] = item"""
+        self.lexemes.__setitem__(index, item)
+        self._redefine_representation()
+
+    def __delitem__(self, index: int) -> None:
+        """del self.lexemes[index]"""
+        self.lexemes.__delitem__(index)
+        self._redefine_representation()
+
+    def __len__(self) -> int:
+        """Return len(self.lexemes)"""
+        return self.lexemes.__len__()
+
+    def __contains__(self, item: Lexeme) -> bool:
+        """Return item in self.lexemes"""
+        return item in self.lexemes
+
+    def __add__(self, other: 'Synonyms') -> 'Synonyms':
+        """Return new Synonyms with lexemes from both self and other"""
+        return Synonyms(self.lexemes + other.lexemes)
+
+    def insert(self, index: int, item: Lexeme) -> None:
+        """self.lexemes.insert(index, item)"""
+        self.lexemes.insert(index, item)
+        self._redefine_representation()
+
+    def append(self, item: Lexeme) -> None:
+        """self.lexemes.append(item)"""
+        self.lexemes.append(item)
+        self._redefine_representation()
+
+    def set_language_code(self, code: str) -> None:
+        for lexeme in self.lexemes:
+            lexeme.set_language_code(code)
+
+    def _redefine_representation(self) -> None:
+        self.representation = '|'.join([lexeme.representation for lexeme in self.lexemes])
