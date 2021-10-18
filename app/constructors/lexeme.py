@@ -1,5 +1,5 @@
-from models.lexeme import Lexeme
-from models.named_matrix import NamedMatrix
+from app.models.lexeme import Lexeme
+from app.models.named_matrix import NamedMatrix
 
 
 def reconstruct_lexeme(

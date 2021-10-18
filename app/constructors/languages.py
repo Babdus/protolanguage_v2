@@ -10,8 +10,8 @@ from app.operations.language import calculate_language_distance
 from app.operations.parser import ipa_string_to_lexeme
 from app.utils.colors import Colored
 from app.utils.timing import timing
-from constructors.lexeme import reconstruct_lexeme
-from operations.lexeme import calculate_lexeme_distance
+from app.constructors.lexeme import reconstruct_lexeme
+from app.operations.lexeme import calculate_lexeme_distance
 
 
 @timing
