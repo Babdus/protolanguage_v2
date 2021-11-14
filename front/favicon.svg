@@ -1,0 +1,35 @@
+<svg viewBox="0 0 900 900" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        :root {
+            --red: #df6757;
+            --yellow: #fac72e;
+            --purple: #9e82d8;
+        }
+
+        circle {
+            r: 36px;
+            stroke-width: 9px;
+            stroke: black;
+        }
+
+        circle.leaf {
+            fill: var(--red);
+        }
+
+        circle.parent {
+            fill: var(--yellow);
+        }
+
+        path {
+            stroke-width: 18px;
+            stroke: black;
+            fill: none;
+        }
+
+        text {
+            font: 0px sans-serif;
+        }
+
+    </style>
+    <g transform="translate(450,450)"><path d="M0 0 A0 0 0 0 0 0 0L68.06229165435995 -46.623754189863824"></path><path d="M-79.35061556175758 22.57719668094682 L0 0A0 0 0 0 0 0 0"></path><path d="M68.06229165435995 -46.623754189863824 A82.5 82.5 0 0 0 29.80243746044011 -76.92895892585935L119.20974984176044 -307.7158357034374"></path><path d="M165 0 L82.5 0A82.5 82.5 0 0 0 68.06229165435995 -46.623754189863824"></path><path d="M-79.35061556175758 22.57719668094682 A82.5 82.5 0 0 0 -36.7734143515644 73.85097153679264L-73.5468287031288 147.70194307358528"></path><path d="M-140.2858273953864 -86.86130687476359 L-70.1429136976932 -43.43065343738179A82.5 82.5 0 0 0 -79.35061556175758 22.57719668094682"></path><path d="M165 0 A165 165 0 0 0 147.70194307358528 -73.5468287031288L295.40388614717057 -147.0936574062576"></path><path d="M221.5529146103779 110.32024305469326 L147.70194307358526 73.54682870312884A165 165 0 0 0 165 0"></path><path d="M-73.5468287031288 147.70194307358528 A165 165 0 0 0 1.0103336092965664e-14 165L1.5155004139448497e-14 247.5"></path><path d="M-263.3456850024791 198.8694300051545 L-131.67284250123956 99.43471500257725A165 165 0 0 0 -73.5468287031288 147.70194307358528"></path><path d="M-140.2858273953864 -86.86130687476359 A165 165 0 0 0 -164.29613908868072 -15.22427931144462L-328.59227817736144 -30.44855862288924"></path><path d="M-130.29196031214545 -210.42874109307957 L-86.86130687476364 -140.28582739538638A165 165 0 0 0 -140.2858273953864 -86.86130687476359"></path><path d="M221.5529146103779 110.32024305469326 A247.5 247.5 0 0 0 238.05184668527272 67.73159004284054L317.40246224703026 90.30878672378739"></path><path d="M263.34568500247906 198.8694300051546 L197.50926375185927 149.15207250386595A247.5 247.5 0 0 0 221.5529146103779 110.32024305469326"></path><path d="M1.5155004139448497e-14 247.5 A247.5 247.5 0 0 0 45.47800565960121 243.2858421717657L60.637340879468276 324.3811228956876"></path><path d="M-60.63734087946823 324.3811228956876 L-45.47800565960117 243.2858421717657A247.5 247.5 0 0 0 1.5155004139448497e-14 247.5"></path><path d="M-130.29196031214545 -210.42874109307957 A247.5 247.5 0 0 0 -166.73967180252296 -182.90470701211308L-222.31956240336396 -243.87294268281744"></path><path d="M-119.20974984176048 -307.7158357034374 L-89.40731238132037 -230.78687677757807A247.5 247.5 0 0 0 -130.29196031214545 -210.42874109307957"></path><g transform="rotate(64.85294117647061)translate(0)"><circle class="parent"></circle><text dy=".31em" dx=".31em" text-anchor="start" transform="translate(8)"></text></g><g transform="rotate(-34.41176470588235)translate(82.5)"><circle class="parent"></circle><text dy=".31em" dx=".31em" text-anchor="start" transform="translate(8)"></text></g><g transform="rotate(164.11764705882354)translate(82.5)"><circle class="parent"></circle><text dy=".31em" dx="-.31em" text-anchor="end" transform="rotate(180)translate(-8)"></text></g><g transform="rotate(-68.82352941176471)translate(330)"><circle class="leaf"></circle><text dy=".31em" dx=".31em" text-anchor="start" transform="translate(8)">Icelandic</text></g><g transform="rotate(0)translate(165)"><circle class="parent"></circle><text dy=".31em" dx=".31em" text-anchor="start" transform="translate(8)"></text></g><g transform="rotate(116.47058823529412)translate(165)"><circle class="parent"></circle><text dy=".31em" dx="-.31em" text-anchor="end" transform="rotate(180)translate(-8)"></text></g><g transform="rotate(211.76470588235293)translate(165)"><circle class="parent"></circle><text dy=".31em" dx="-.31em" text-anchor="end" transform="rotate(180)translate(-8)"></text></g><g transform="rotate(-26.470588235294116)translate(330)"><circle class="leaf"></circle><text dy=".31em" dx=".31em" text-anchor="start" transform="translate(8)">English</text></g><g transform="rotate(26.47058823529413)translate(247.5)"><circle class="parent"></circle><text dy=".31em" dx=".31em" text-anchor="start" transform="translate(8)"></text></g><g transform="rotate(90)translate(247.5)"><circle class="parent"></circle><text dy=".31em" dx="-.31em" text-anchor="end" transform="rotate(180)translate(-8)"></text></g><g transform="rotate(142.94117647058826)translate(330)"><circle class="leaf"></circle><text dy=".31em" dx="-.31em" text-anchor="end" transform="rotate(180)translate(-8)">Livonian</text></g><g transform="rotate(185.29411764705878)translate(330)"><circle class="leaf"></circle><text dy=".31em" dx="-.31em" text-anchor="end" transform="rotate(180)translate(-8)">Polish</text></g><g transform="rotate(238.23529411764707)translate(247.5)"><circle class="parent"></circle><text dy=".31em" dx="-.31em" text-anchor="end" transform="rotate(180)translate(-8)"></text></g><g transform="rotate(15.882352941176478)translate(330)"><circle class="leaf"></circle><text dy=".31em" dx=".31em" text-anchor="start" transform="translate(8)">German</text></g><g transform="rotate(37.05882352941177)translate(330)"><circle class="leaf"></circle><text dy=".31em" dx=".31em" text-anchor="start" transform="translate(8)">Dutch</text></g><g transform="rotate(79.41176470588235)translate(330)"><circle class="leaf"></circle><text dy=".31em" dx=".31em" text-anchor="start" transform="translate(8)">Estonian</text></g><g transform="rotate(100.58823529411765)translate(330)"><circle class="leaf"></circle><text dy=".31em" dx="-.31em" text-anchor="end" transform="rotate(180)translate(-8)">Võro</text></g><g transform="rotate(227.6470588235294)translate(330)"><circle class="leaf"></circle><text dy=".31em" dx="-.31em" text-anchor="end" transform="rotate(180)translate(-8)">Ukrainian</text></g><g transform="rotate(248.8235294117647)translate(330)"><circle class="leaf"></circle><text dy=".31em" dx="-.31em" text-anchor="end" transform="rotate(180)translate(-8)">Russian</text></g></g>
+</svg>
